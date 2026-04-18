@@ -1,1 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>❤️ 重要的问题 ❤️</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #FFE4E1; /* 对应 Tkinter 的 bg='#FFE4E1' */
+            font-family: '楷体', 'STKaiti', serif;
+            overflow: hidden;
+            touch-action: none; /* 防止手机端缩放 */
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 10;
+            width: 85%;
+            max-width: 350px;
+        }
+        h1 { 
+            color: #FF1493; 
+            font-size: 24px; 
+            margin-bottom: 30px; 
+            font-weight: bold;
+        }
+        .btn-frame {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 80px;
+            position: relative;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        #yes-btn {
+            background-color: #FF69B4;
+            color: white;
+            font-weight: bold;
+        }
+        #no-btn {
+            background-color: #CCCCCC;
+            color: #666666;
+            position: absolute; /* 关键：必须绝对定位才能“逃跑” */
+            transition: all 0.2s ease;
+        }
+        /* 弹窗样式：对应你 Python 的 random_color */
+        .message-box {
+            position: fixed;
+            padding: 10px 20px;
+            color: #8B0000;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+            z-index: 100;
+            white-space: nowrap;
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+        @keyframes pop {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .hint { color: #888888; font-size: 14px; margin-top: 20px; }
+    </style>
+</head>
+<body>
 
+    <div class="container" id="main-ui">
+        <h1>可以成为我的恋人吗？</h1>
+        <div class="btn-frame">
+            <button id="yes-btn">可以 ❤️</button>
+            <button id="no-btn">不可以</button>
+        </div>
+        <div class="hint">提示：试着点击'可以'按钮哦~</div>
+    </div>
+
+    <script>
+        // 1. 复刻你的 messages 数组
+        const messages = [
+            "我想你了! ❤️", "多喝水哦", "保持微笑呀", "每天都要元气慢慢呢",
+            "记得吃水果", "保持好心情", "好好爱自己", "梦想成真",
+            "期待下一次见面", "要相信自己", "我好喜欢你呀! 💕", "你超棒的",
+            "记得好好护肤", "你笑起来真好看!", "珍惜每一刻", "今天有没有想我呀?",
+            "要注意身体，别太累了!", "你的一切都让我心动!", 
+            "遇见你是我最大的幸运!", "我会一直陪在你身边的! 🌟"
+        ];
+
+        // 2. 复刻你的 random_color
+        const colors = [
+            '#FFB6C1', '#FF69B4', '#FF1493', '#DB7093', '#FFC0CB',
+            '#FFA07A', '#FF7F50', '#FF6347', '#FFA500', '#FFD700',
+            '#FFFACD', '#F0E68C', '#E6E6FA', '#D8BFD8', '#DDA0DD',
+            '#EE82EE', '#DA70D6', '#BA55D3'
+        ];
+
+        const noBtn = document.getElementById('no-btn');
+        const yesBtn = document.getElementById('yes-btn');
+        const mainUI = document.getElementById('main-ui');
+
+        // 3. 复刻 on_no_enter 逻辑（躲避按钮）
+        function moveNoButton() {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 20);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 20);
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+        }
+
+        noBtn.addEventListener('mouseenter', moveNoButton);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // 防止手机端默认点击
+            moveNoButton();
+        });
+
+        // 4. 复刻 start_effects 逻辑
+        yesBtn.onclick = function() {
+            mainUI.style.display = 'none'; // 隐藏主界面
+            
+            // 先生成爱心形状 (对应 create_heart)
+            createHeartEffect();
+            
+            // 等待一段时间开始随机弹窗 (对应 Python 的 sleep(2))
+            setTimeout(() => {
+                continuousRandomWindows();
+            }, 2000);
+        };
+
+        // 5. 复刻 heart_coordinates (爱心形状逻辑)
+        function createHeartEffect() {
+            const numWindows = 60;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2 - 50;
+            const size = window.innerWidth < 500 ? 10 : 18; // 手机端缩小比例
+
+            for (let i = 0; i < numWindows; i++) {
+                setTimeout(() => {
+                    const t = (2 * Math.PI * i) / numWindows;
+                    let x = 16 * Math.pow(Math.sin(t), 3);
+                    let y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                    
+                    const posX = centerX + x * size;
+                    const posY = centerY - y * size;
+                    
+                    spawnPopup(posX, posY);
+                }, i * 80); // 对应 Python 的 time.sleep(0.08)
+            }
+        }
+
+        // 6. 复刻 continuous_random_windows (随机生成 30 个)
+        function continuousRandomWindows() {
+            let count = 0;
+            const interval = setInterval(() => {
+                const posX = Math.random() * (window.innerWidth - 200);
+                const posY = Math.random() * (window.innerHeight - 100);
+                spawnPopup(posX, posY);
+                count++;
+                if (count >= 30) clearInterval(interval);
+            }, 100); // 对应 Python 的 0.1秒间隔
+        }
+
+        // 通用弹窗生成函数 (对应 dow 和 create_random_window)
+        function spawnPopup(x, y) {
+            const div = document.createElement('div');
+            div.className = 'message-box';
+            div.innerText = messages[Math.floor(Math.random() * messages.length)];
+            div.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            div.style.left = x + 'px';
+            div.style.top = y + 'px';
+            document.body.appendChild(div);
+        }
+    </script>
+</body>
+</html>
