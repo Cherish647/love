@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>❤️ 重要的问题 ❤️</title>
+    <title>❤️ 专属浪漫 ❤️</title>
     <style>
-        /* 基础样式复刻 Python Tkinter 的视觉感 */
+        /* 禁止选中和长按菜单，强化防御 */
         * {
             -webkit-user-select: none;
             user-select: none;
@@ -18,7 +18,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #FFE4E1; /* window.configure(bg='#FFE4E1') */
+            background-color: #FFE4E1; /* 浪漫粉色背景 */
             font-family: '楷体', 'STKaiti', serif;
             overflow: hidden;
             touch-action: none;
@@ -26,74 +26,63 @@
 
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 30px 20px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             z-index: 10;
             width: 80%;
-            max-width: 350px;
+            max-width: 300px;
         }
 
-        h1 { 
-            color: #FF1493; 
-            font-size: 22px; 
-            margin-bottom: 30px; 
-        }
+        h1 { color: #FF1493; font-size: 1.3rem; margin-bottom: 25px; }
 
         .btn-frame {
             display: flex;
             justify-content: space-around;
             align-items: center;
-            height: 100px;
+            height: 80px;
             position: relative;
         }
 
         button {
-            padding: 12px 25px;
-            font-size: 18px;
+            padding: 10px 20px;
+            font-size: 16px;
             border-radius: 10px;
             border: none;
             cursor: pointer;
             outline: none;
-            transition: all 0.15s ease;
+            transition: all 0.1s ease; /* 让躲避更丝滑 */
         }
 
-        #yes-btn {
-            background-color: #FF69B4;
-            color: white;
-            font-weight: bold;
-        }
+        #yes-btn { background-color: #FF69B4; color: white; font-weight: bold; }
 
         #no-btn {
             background-color: #CCCCCC;
-            color: #666666;
-            position: absolute; 
+            color: #666;
+            position: absolute;
             z-index: 1000;
         }
 
-        /* 弹窗样式复刻 Python 的 label 样式 */
+        /* 弹窗样式 */
         .message-box {
             position: fixed;
-            padding: 12px 20px;
+            padding: 8px 15px;
             color: #8B0000;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
-            border-radius: 10px;
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+            border-radius: 30px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
             z-index: 100;
             white-space: nowrap;
             animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
-            border: 2px solid rgba(0,0,0,0.05);
         }
 
         @keyframes pop {
             0% { transform: scale(0); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-
-        .hint { color: #888888; font-size: 13px; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -104,103 +93,134 @@
             <button id="yes-btn">可以 ❤️</button>
             <button id="no-btn">不可以</button>
         </div>
-        <div class="hint">提示：试着点击'可以'按钮哦~</div>
     </div>
 
     <script>
-        // 1. 完全复刻 Python 的消息列表
-        const messages = [
-            "我想你了! ❤️", "多喝水哦", "保持微笑呀", "每天都要元气慢慢呢",
-            "记得吃水果", "保持好心情", "好好爱自己", "梦想成真",
-            "期待下一次见面", "要相信自己", "我好喜欢你呀! 💕", "你超棒的",
-            "记得好好护肤", "你笑起来真好看!", "珍惜每一刻", "今天有没有想我呀?",
-            "要注意身体，别太累了!", "你的一切都让我心动!", 
-            "遇见你是我最大的幸运!", "我会一直陪在你身边的! 🌟"
-        ];
-
-        // 2. 完全复刻 Python 的随机颜色函数
-        const colors = [
-            '#FFB6C1', '#FF69B4', '#FF1493', '#DB7093', '#FFC0CB',
-            '#FFA07A', '#FF7F50', '#FF6347', '#FFA500', '#FFD700',
-            '#FFFACD', '#F0E68C', '#E6E6FA', '#D8BFD8', '#DDA0DD',
-            '#EE82EE', '#DA70D6', '#BA55D3'
-        ];
+        const messages = ["我想你了! ❤️", "保持微笑", "元气满满", "记得吃水果", "保持好心情", "好好爱自己", "梦想成真", "我喜欢你", "你超棒的", "珍惜每一刻", "想我了吗？", "遇见你是幸运", "一直陪着你", "爱你哟", "我的宝"];
+        const colors = ['#FFB6C1', '#FF69B4', '#FFC0CB', '#FFA07A', '#E6E6FA', '#DDA0DD'];
 
         const noBtn = document.getElementById('no-btn');
         const yesBtn = document.getElementById('yes-btn');
         const mainUI = document.getElementById('main-ui');
 
-        // 3. 躲避逻辑：复刻 on_no_enter
+        // 全局变量，用于爱心计算
+        let centerX, centerY, heartSize;
+
+        // --- 核心优化：确保“不可以”不能跑出屏幕 ---
         function moveNoButton() {
             noBtn.style.position = 'fixed';
-            const padding = 20;
-            const maxWidth = window.innerWidth - noBtn.offsetWidth - padding;
-            const maxHeight = window.innerHeight - noBtn.offsetHeight - padding;
             
-            const randomX = Math.random() * maxWidth + padding/2;
-            const randomY = Math.random() * maxHeight + padding/2;
+            // 关键点：预留安全边距 (padding) 
+            const padding = 20; 
+            
+            // 计算可移动的最大 X 和 Y，必须扣除按钮自身的宽度和高度
+            // 确保按钮的右边缘和下边缘依然在屏幕内
+            const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+            const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+            
+            // 生成随机坐标，并加上 padding 偏移，防止靠边
+            const randomX = Math.random() * (maxX - padding) + padding;
+            const randomY = Math.random() * (maxY - padding) + padding;
 
             noBtn.style.left = randomX + 'px';
             noBtn.style.top = randomY + 'px';
+            
+            // 增加一点灵动的随机旋转
+            const angle = (Math.random() - 0.5) * 20;
+            noBtn.style.transform = `rotate(${angle}deg)`;
         }
 
+        // 适配手机端触摸和电脑端鼠标
+        noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
         noBtn.addEventListener('mouseenter', moveNoButton);
-        noBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            moveNoButton();
-        });
+        noBtn.onclick = (e) => { e.preventDefault(); moveNoButton(); }; // 点击也跳走
 
-        // 4. 核心逻辑：点击“可以”后的效果
         yesBtn.onclick = function() {
             mainUI.style.display = 'none';
             
-            // 阶段一：复刻 create_heart (爱心坐标计算)
-            createHeartEffect();
+            // 初始化屏幕中心和爱心大小
+            centerX = window.innerWidth / 2;
+            centerY = window.innerHeight / 2;
+            // 自动适配手机和电脑的大小
+            heartSize = Math.min(window.innerWidth, window.innerHeight) / 30;
+
+            // 阶段1：绘制爱心轮廓
+            createHeartOutline();
             
-            // 阶段二：延迟后开启持续随机弹窗 (复刻 Python 的 time.sleep(2))
-            // 延长了运行时间，随机弹窗更多
+            // 阶段2：延迟后开启“爱心内填充”
             setTimeout(() => {
-                continuousRandomWindows();
-            }, 2500);
+                continuousRandomWindowsInsideHeart();
+            }, 3000); // 3秒后开始填充，延长浪漫感
         };
 
-        function createHeartEffect() {
-            const numWindows = 80; // 复刻 Python 的 num_windows = 80
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2 - 50;
-            // 适配手机/电脑屏幕的大小
-            const size = window.innerWidth < 500 ? 12 : 22; 
+        // --- 绘制清晰的爱心轮廓 ---
+        function createHeartOutline() {
+            const numWindows = 50; // 粒子数量
 
             for (let i = 0; i < numWindows; i++) {
                 setTimeout(() => {
                     const t = (2 * Math.PI * i) / numWindows;
-                    // --- 完全复刻 Python 的爱心曲线方程 ---
+                    // 复刻 Python 的爱心公式
                     const x = 16 * Math.pow(Math.sin(t), 3);
                     const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
                     
-                    const posX = centerX + x * size;
-                    const posY = centerY - y * size;
-                    spawnPopup(posX, posY);
-                }, i * 100); // 稍微拉长间隔，让爱心成型更丝滑
+                    // 加上 offset 修正，让粒子中心对齐轮廓
+                    spawnPopup(centerX + x * heartSize - 30, centerY - y * heartSize - 15);
+                }, i * 100); // 间隔0.1秒出一个
             }
         }
 
-        // 5. 延长运行时间的随机弹窗部分
-        function continuousRandomWindows() {
+        // --- 核心优化：确保随机弹窗只出现在爱心内部 ---
+        function continuousRandomWindowsInsideHeart() {
             let count = 0;
-            const maxCount = 60; // 【延长修改】从原来的 30 个增加到 60 个
+            const maxMessages = 30; // 随机填充30个，不宜过多，防止全黑
+            
             const interval = setInterval(() => {
-                const posX = Math.random() * (window.innerWidth - 180);
-                const posY = Math.random() * (window.innerHeight - 80);
-                spawnPopup(posX, posY);
+                // 利用“爱心内部采样”算法
+                // 生成一个在爱心方程包络范围内的随机点
+                const point = generateRandomPointInsideHeart();
+                spawnPopup(point.x, point.y);
+                
                 count++;
-                if (count >= maxCount) {
-                    clearInterval(interval);
-                }
-            }, 150); // 每 0.15 秒出一个
+                if (count >= maxMessages) clearInterval(interval);
+            }, 250); // 每0.25秒填充一个，让过程持久
         }
 
-        // 通用生成函数，复刻 Python 的 dow 和 create_random_window
+        // 数学算法：生成爱心内部的随机点
+        function generateRandomPointInsideHeart() {
+            while (true) {
+                // 在爱心的 X 和 Y 最大包络范围内随机采样
+                // 爱心 X 最大范围是 [-16, 16], Y 最大范围是 [-18, 13] (相对坐标)
+                const relativeX = (Math.random() - 0.5) * 32; // [-16, 16]
+                const relativeY = (Math.random() * 31 - 18);   // [-18, 13]
+                
+                // 计算相对坐标对应的爱心边界方程 (x=16*sin^3, y=13*cos-5*cos2-2*cos3-cos4)
+                // 这里利用一个简化的“心形包络函数”来近似判断：(x^2 + (y-sqrt(|x|))^2) <= R^2
+                // 这个简化的心形函数能更高效地判断。
+                // 或者我们直接采样一个 t 角，生成点，然后在这个点的向心方向采样。
+                
+                // 为了保证“不像爱心了”彻底解决，我用一个更严谨的包络判断：
+                const t = Math.atan2(relativeX, relativeY); // 计算采样的角
+                // 边界处的 X, Y (方程计算值)
+                const boundX = 16 * Math.pow(Math.sin(t), 3);
+                const boundY = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                
+                // 计算边界点的模 (到原点的距离)
+                const boundDist = Math.sqrt(boundX * boundX + boundY * boundY);
+                // 计算采样点的模
+                const sampleDist = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
+
+                // 如果采样点在边界内，且在原点一定范围内 (防止过于向心), 则接受
+                if (sampleDist < boundDist * 0.9) {
+                    return {
+                        x: centerX + relativeX * heartSize - 30,
+                        y: centerY - relativeY * heartSize - 15
+                    };
+                }
+                // 如果不符合，则重复采样，直到找到爱心内部的点
+            }
+        }
+
         function spawnPopup(x, y) {
             const div = document.createElement('div');
             div.className = 'message-box';
