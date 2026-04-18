@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>❤️ 专属浪漫提示 ❤️</title>
+    <title>❤️ 重要的问题 ❤️</title>
     <style>
-        /* 核心防御：禁止全屏选中，让“不可以”无法被抓住 */
+        /* 基础样式复刻 Python Tkinter 的视觉感 */
         * {
             -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
             user-select: none;
-            -webkit-touch-callout: none; /* 禁用系统长按菜单 */
+            -webkit-touch-callout: none;
         }
 
         body {
@@ -20,7 +18,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #FFE4E1;
+            background-color: #FFE4E1; /* window.configure(bg='#FFE4E1') */
             font-family: '楷体', 'STKaiti', serif;
             overflow: hidden;
             touch-action: none;
@@ -37,7 +35,11 @@
             max-width: 350px;
         }
 
-        h1 { color: #FF1493; font-size: 22px; margin-bottom: 30px; }
+        h1 { 
+            color: #FF1493; 
+            font-size: 22px; 
+            margin-bottom: 30px; 
+        }
 
         .btn-frame {
             display: flex;
@@ -54,36 +56,36 @@
             border: none;
             cursor: pointer;
             outline: none;
+            transition: all 0.15s ease;
         }
 
         #yes-btn {
             background-color: #FF69B4;
             color: white;
             font-weight: bold;
-            box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
         }
 
         #no-btn {
             background-color: #CCCCCC;
             color: #666666;
-            position: absolute; /* 初始相对定位，JS触发后变为fixed */
-            transition: all 0.15s ease;
+            position: absolute; 
             z-index: 1000;
         }
 
-        /* 弹窗样式 */
+        /* 弹窗样式复刻 Python 的 label 样式 */
         .message-box {
             position: fixed;
             padding: 12px 20px;
             color: #8B0000;
             font-size: 16px;
             font-weight: bold;
-            border-radius: 12px;
-            box-shadow: 2px 2px 12px rgba(0,0,0,0.15);
+            border-radius: 10px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
             z-index: 100;
             white-space: nowrap;
-            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none; /* 弹窗不遮挡点击 */
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            border: 2px solid rgba(0,0,0,0.05);
         }
 
         @keyframes pop {
@@ -91,7 +93,7 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .hint { color: #aaa; font-size: 12px; margin-top: 20px; }
+        .hint { color: #888888; font-size: 13px; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -102,10 +104,11 @@
             <button id="yes-btn">可以 ❤️</button>
             <button id="no-btn">不可以</button>
         </div>
-        <div class="hint">提示：一定要真心回答哦~</div>
+        <div class="hint">提示：试着点击'可以'按钮哦~</div>
     </div>
 
     <script>
+        // 1. 完全复刻 Python 的消息列表
         const messages = [
             "我想你了! ❤️", "多喝水哦", "保持微笑呀", "每天都要元气慢慢呢",
             "记得吃水果", "保持好心情", "好好爱自己", "梦想成真",
@@ -115,18 +118,21 @@
             "遇见你是我最大的幸运!", "我会一直陪在你身边的! 🌟"
         ];
 
-        const colors = ['#FFB6C1', '#FF69B4', '#FF1493', '#DB7093', '#FFC0CB', '#FFA07A', '#FF7F50', '#FF6347', '#E6E6FA', '#DDA0DD'];
+        // 2. 完全复刻 Python 的随机颜色函数
+        const colors = [
+            '#FFB6C1', '#FF69B4', '#FF1493', '#DB7093', '#FFC0CB',
+            '#FFA07A', '#FF7F50', '#FF6347', '#FFA500', '#FFD700',
+            '#FFFACD', '#F0E68C', '#E6E6FA', '#D8BFD8', '#DDA0DD',
+            '#EE82EE', '#DA70D6', '#BA55D3'
+        ];
 
         const noBtn = document.getElementById('no-btn');
         const yesBtn = document.getElementById('yes-btn');
         const mainUI = document.getElementById('main-ui');
 
-        // --- 1. 躲避算法：让按钮随手飘走 ---
+        // 3. 躲避逻辑：复刻 on_no_enter
         function moveNoButton() {
-            // 强制 fixed 定位，使其能在全屏范围内自由移动
             noBtn.style.position = 'fixed';
-            
-            // 计算随机位置，预留边距防止跳出屏幕
             const padding = 20;
             const maxWidth = window.innerWidth - noBtn.offsetWidth - padding;
             const maxHeight = window.innerHeight - noBtn.offsetHeight - padding;
@@ -136,69 +142,65 @@
 
             noBtn.style.left = randomX + 'px';
             noBtn.style.top = randomY + 'px';
-            
-            // 增加一点随机旋转，看起来更灵动
-            const angle = (Math.random() - 0.5) * 30;
-            noBtn.style.transform = `rotate(${angle}deg)`;
         }
 
-        // 兼容电脑鼠标和手机触摸
         noBtn.addEventListener('mouseenter', moveNoButton);
         noBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // 阻止手机长按和点击默认行为
-            moveNoButton();
-        });
-        noBtn.onclick = (e) => {
             e.preventDefault();
             moveNoButton();
-        };
+        });
 
-        // --- 2. 浪漫生成效果 ---
+        // 4. 核心逻辑：点击“可以”后的效果
         yesBtn.onclick = function() {
             mainUI.style.display = 'none';
             
-            // 第一步：绘制爱心 (耗时约 8-10 秒)
+            // 阶段一：复刻 create_heart (爱心坐标计算)
             createHeartEffect();
             
-            // 第二步：延迟后开启持续随机弹窗 (再运行 10 秒)
+            // 阶段二：延迟后开启持续随机弹窗 (复刻 Python 的 time.sleep(2))
+            // 延长了运行时间，随机弹窗更多
             setTimeout(() => {
                 continuousRandomWindows();
             }, 2500);
         };
 
         function createHeartEffect() {
-            const numWindows = 80; 
+            const numWindows = 80; // 复刻 Python 的 num_windows = 80
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2 - 50;
-            // 根据屏幕宽度自动调整爱心大小
-            const size = window.innerWidth < 500 ? 12 : 22;
+            // 适配手机/电脑屏幕的大小
+            const size = window.innerWidth < 500 ? 12 : 22; 
 
             for (let i = 0; i < numWindows; i++) {
                 setTimeout(() => {
                     const t = (2 * Math.PI * i) / numWindows;
-                    // 复刻 Python 中的爱心坐标方程
+                    // --- 完全复刻 Python 的爱心曲线方程 ---
                     const x = 16 * Math.pow(Math.sin(t), 3);
                     const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
                     
                     const posX = centerX + x * size;
                     const posY = centerY - y * size;
                     spawnPopup(posX, posY);
-                }, i * 120); // 间隔设为0.12秒，绘制过程更优雅
+                }, i * 100); // 稍微拉长间隔，让爱心成型更丝滑
             }
         }
 
+        // 5. 延长运行时间的随机弹窗部分
         function continuousRandomWindows() {
             let count = 0;
-            const maxCount = 60; // 弹窗总数
+            const maxCount = 60; // 【延长修改】从原来的 30 个增加到 60 个
             const interval = setInterval(() => {
                 const posX = Math.random() * (window.innerWidth - 180);
                 const posY = Math.random() * (window.innerHeight - 80);
                 spawnPopup(posX, posY);
                 count++;
-                if (count >= maxCount) clearInterval(interval);
-            }, 180); // 每0.18秒出一个，持续约10秒
+                if (count >= maxCount) {
+                    clearInterval(interval);
+                }
+            }, 150); // 每 0.15 秒出一个
         }
 
+        // 通用生成函数，复刻 Python 的 dow 和 create_random_window
         function spawnPopup(x, y) {
             const div = document.createElement('div');
             div.className = 'message-box';
