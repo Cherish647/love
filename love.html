@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>❤️ 专属浪漫 ❤️</title>
+    <title>❤️ 专属浪漫提示 ❤️</title>
     <style>
-        /* 禁止选中和长按菜单，强化防御 */
+        /* 彻底禁止选中，防止“抓住”按钮 */
         * {
             -webkit-user-select: none;
             user-select: none;
@@ -18,7 +18,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #FFE4E1; /* 浪漫粉色背景 */
+            background-color: #FFE4E1;
             font-family: '楷体', 'STKaiti', serif;
             overflow: hidden;
             touch-action: none;
@@ -26,7 +26,7 @@
 
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.95);
             padding: 30px 20px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -52,7 +52,6 @@
             border: none;
             cursor: pointer;
             outline: none;
-            transition: all 0.1s ease; /* 让躲避更丝滑 */
         }
 
         #yes-btn { background-color: #FF69B4; color: white; font-weight: bold; }
@@ -60,11 +59,11 @@
         #no-btn {
             background-color: #CCCCCC;
             color: #666;
-            position: absolute;
+            position: absolute; /* 初始位置 */
             z-index: 1000;
+            transition: all 0.1s ease;
         }
 
-        /* 弹窗样式 */
         .message-box {
             position: fixed;
             padding: 8px 15px;
@@ -96,129 +95,90 @@
     </div>
 
     <script>
-        const messages = ["我想你了! ❤️", "保持微笑", "元气满满", "记得吃水果", "保持好心情", "好好爱自己", "梦想成真", "我喜欢你", "你超棒的", "珍惜每一刻", "想我了吗？", "遇见你是幸运", "一直陪着你", "爱你哟", "我的宝"];
+        const messages = ["我想你了! ❤️", "保持微笑呀", "元气满满", "记得吃水果", "保持好心情", "好好爱自己", "梦想成真", "我好喜欢你呀! 💕", "你超棒的", "珍惜每一刻", "想我了吗？", "遇见你是幸运", "一直陪着你! 🌟"];
         const colors = ['#FFB6C1', '#FF69B4', '#FFC0CB', '#FFA07A', '#E6E6FA', '#DDA0DD'];
 
         const noBtn = document.getElementById('no-btn');
         const yesBtn = document.getElementById('yes-btn');
         const mainUI = document.getElementById('main-ui');
 
-        // 全局变量，用于爱心计算
-        let centerX, centerY, heartSize;
-
-        // --- 核心优化：确保“不可以”不能跑出屏幕 ---
+        // --- 核心修复：绝对不会跳出屏幕的“不可以” ---
         function moveNoButton() {
+            // 设置为 fixed 以便在整个视口移动
             noBtn.style.position = 'fixed';
             
-            // 关键点：预留安全边距 (padding) 
-            const padding = 20; 
+            // 安全边距：防止贴边看不见
+            const padding = 30;
             
-            // 计算可移动的最大 X 和 Y，必须扣除按钮自身的宽度和高度
-            // 确保按钮的右边缘和下边缘依然在屏幕内
+            // 可移动的有效宽度 = 屏幕宽度 - 按钮本身宽度 - 左右边距
             const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+            // 可移动的有效高度 = 屏幕高度 - 按钮本身高度 - 上下边距
             const maxY = window.innerHeight - noBtn.offsetHeight - padding;
-            
-            // 生成随机坐标，并加上 padding 偏移，防止靠边
-            const randomX = Math.random() * (maxX - padding) + padding;
-            const randomY = Math.random() * (maxY - padding) + padding;
+
+            // 确保坐标在 [padding, maxX] 之间，绝对不会变成负数或超出范围
+            const randomX = Math.max(padding, Math.random() * maxX);
+            const randomY = Math.max(padding, Math.random() * maxY);
 
             noBtn.style.left = randomX + 'px';
             noBtn.style.top = randomY + 'px';
-            
-            // 增加一点灵动的随机旋转
-            const angle = (Math.random() - 0.5) * 20;
-            noBtn.style.transform = `rotate(${angle}deg)`;
         }
 
-        // 适配手机端触摸和电脑端鼠标
+        // 针对手机触摸和鼠标移入
         noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
         noBtn.addEventListener('mouseenter', moveNoButton);
-        noBtn.onclick = (e) => { e.preventDefault(); moveNoButton(); }; // 点击也跳走
+        noBtn.onclick = (e) => { e.preventDefault(); moveNoButton(); };
 
+        // --- 核心修复：保持爱心形状不走样 ---
         yesBtn.onclick = function() {
             mainUI.style.display = 'none';
-            
-            // 初始化屏幕中心和爱心大小
-            centerX = window.innerWidth / 2;
-            centerY = window.innerHeight / 2;
-            // 自动适配手机和电脑的大小
-            heartSize = Math.min(window.innerWidth, window.innerHeight) / 30;
-
-            // 阶段1：绘制爱心轮廓
-            createHeartOutline();
-            
-            // 阶段2：延迟后开启“爱心内填充”
-            setTimeout(() => {
-                continuousRandomWindowsInsideHeart();
-            }, 3000); // 3秒后开始填充，延长浪漫感
+            createHeartEffect();
+            // 延长总运行时间，先画轮廓，再慢慢填充内部
+            setTimeout(fillHeartInterior, 3500);
         };
 
-        // --- 绘制清晰的爱心轮廓 ---
-        function createHeartOutline() {
-            const numWindows = 50; // 粒子数量
+        let centerX, centerY, heartSize;
+
+        function createHeartEffect() {
+            centerX = window.innerWidth / 2;
+            centerY = window.innerHeight / 2;
+            // 自动适配手机大小，爱心占屏幕约 1/3
+            heartSize = Math.min(window.innerWidth, window.innerHeight) / 35;
+
+            const numWindows = 60; // 轮廓粒子
 
             for (let i = 0; i < numWindows; i++) {
                 setTimeout(() => {
                     const t = (2 * Math.PI * i) / numWindows;
-                    // 复刻 Python 的爱心公式
                     const x = 16 * Math.pow(Math.sin(t), 3);
                     const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
                     
-                    // 加上 offset 修正，让粒子中心对齐轮廓
-                    spawnPopup(centerX + x * heartSize - 30, centerY - y * heartSize - 15);
-                }, i * 100); // 间隔0.1秒出一个
+                    // 修正粒子位置，使其完美围绕中心
+                    spawnPopup(centerX + x * heartSize - 40, centerY - y * heartSize - 20);
+                }, i * 100);
             }
         }
 
-        // --- 核心优化：确保随机弹窗只出现在爱心内部 ---
-        function continuousRandomWindowsInsideHeart() {
+        // 核心优化：只在爱心内部随机生成
+        function fillHeartInterior() {
             let count = 0;
-            const maxMessages = 30; // 随机填充30个，不宜过多，防止全黑
-            
+            const maxFill = 40; 
             const interval = setInterval(() => {
-                // 利用“爱心内部采样”算法
-                // 生成一个在爱心方程包络范围内的随机点
-                const point = generateRandomPointInsideHeart();
-                spawnPopup(point.x, point.y);
+                // 生成一个在爱心包络圆内的点
+                const angle = Math.random() * Math.PI * 2;
+                const radius = Math.random() * 0.8; // 0.8 倍半径确保不超出轮廓
                 
+                const t = angle;
+                const bx = 16 * Math.pow(Math.sin(t), 3);
+                const by = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                
+                // 最终位置 = 中心点 + 边界点 * 随机半径
+                const px = centerX + (bx * heartSize * radius) - 40;
+                const py = centerY - (by * heartSize * radius) - 20;
+
+                spawnPopup(px, py);
                 count++;
-                if (count >= maxMessages) clearInterval(interval);
-            }, 250); // 每0.25秒填充一个，让过程持久
-        }
-
-        // 数学算法：生成爱心内部的随机点
-        function generateRandomPointInsideHeart() {
-            while (true) {
-                // 在爱心的 X 和 Y 最大包络范围内随机采样
-                // 爱心 X 最大范围是 [-16, 16], Y 最大范围是 [-18, 13] (相对坐标)
-                const relativeX = (Math.random() - 0.5) * 32; // [-16, 16]
-                const relativeY = (Math.random() * 31 - 18);   // [-18, 13]
-                
-                // 计算相对坐标对应的爱心边界方程 (x=16*sin^3, y=13*cos-5*cos2-2*cos3-cos4)
-                // 这里利用一个简化的“心形包络函数”来近似判断：(x^2 + (y-sqrt(|x|))^2) <= R^2
-                // 这个简化的心形函数能更高效地判断。
-                // 或者我们直接采样一个 t 角，生成点，然后在这个点的向心方向采样。
-                
-                // 为了保证“不像爱心了”彻底解决，我用一个更严谨的包络判断：
-                const t = Math.atan2(relativeX, relativeY); // 计算采样的角
-                // 边界处的 X, Y (方程计算值)
-                const boundX = 16 * Math.pow(Math.sin(t), 3);
-                const boundY = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
-                
-                // 计算边界点的模 (到原点的距离)
-                const boundDist = Math.sqrt(boundX * boundX + boundY * boundY);
-                // 计算采样点的模
-                const sampleDist = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
-
-                // 如果采样点在边界内，且在原点一定范围内 (防止过于向心), 则接受
-                if (sampleDist < boundDist * 0.9) {
-                    return {
-                        x: centerX + relativeX * heartSize - 30,
-                        y: centerY - relativeY * heartSize - 15
-                    };
-                }
-                // 如果不符合，则重复采样，直到找到爱心内部的点
-            }
+                if (count >= maxFill) clearInterval(interval);
+            }, 200);
         }
 
         function spawnPopup(x, y) {
